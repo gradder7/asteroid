@@ -8,7 +8,11 @@ export default function SetDate() {
   const [date, setdate] = useState([]);
   const [showData, setShowData] = useState(false);
   const [asteroidData, setAsteroidData] = useState({});
-  const [chartData, setChartData] = useState({});
+  // const [chartData, setChartData] = useState({});
+  const [fastest, setFastest] = useState({});
+  const [numOfAsteroids, setNumOfAsteorids] = useState({});
+  const [closestAstroid, setClosestAstorid] = useState({});
+  const [avgSizeAstroid, setAvgSizeAstroid] = useState({});
 
   const handleOnchangeDate = (value) => {
     setdate(value);
@@ -55,8 +59,8 @@ export default function SetDate() {
               : prev,
           asteroids[0]
         );
-        console.log("fastest",fastestAsteroidForDate);
-        
+        console.log("fastest", fastestAsteroidForDate);
+
         //get the fasted data of date
         fastestAsteroid.push(
           parseFloat(
@@ -64,7 +68,6 @@ export default function SetDate() {
               .kilometers_per_hour
           ).toFixed(2)
         );
-
 
         let closestAsteroidForDate = asteroids.reduce(
           (prev, curr) =>
@@ -99,7 +102,52 @@ export default function SetDate() {
         numAsteroids.push(asteroids.length);
       }
 
-      setChartData({
+      // setChartData({
+      //   labels: labels,
+      //   datasets: [
+      //     {
+      // label: "Fastest Asteroid (km/h)",
+      // data: fastestAsteroid,
+      // backgroundColor: "rgba(255, 99,0, 0.2)",
+      // borderColor: "rgba(255, 99, 0, 1)",
+      // borderWidth: 1,
+      //     },
+      //     {
+      // label: "Closest Asteroid (km)",
+      // data: closestAsteroid,
+      // backgroundColor: "rgba(54, 162, 235, 0.2)",
+      // borderColor: "rgba(54, 162, 235, 1)",
+      // borderWidth: 1,
+      //     },
+      //     {
+      // label: "Average Size of Asteroids (km)",
+      // data: avgSizeAsteroid,
+      // backgroundColor: "rgba(255, 206, 86, 0.2)",
+      // borderColor: "rgba(255, 206, 86, 1)",
+      // borderWidth: 1,
+      //     },
+      //     {
+      // label: "Number of Asteroids",
+      // data: numAsteroids,
+      // backgroundColor: "rgba(75, 192, 192, 0.2)",
+      // borderColor: "rgba(75, 192, 192, 1)",
+      // borderWidth: 1,
+      //     },
+      //   ],
+      // });
+      setNumOfAsteorids({
+        labels: labels,
+        datasets: [
+          {
+            label: "Number of Asteroids",
+            data: numAsteroids,
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            borderColor: "rgba(75, 192, 192, 1)",
+            borderWidth: 1,
+          },
+        ],
+      });
+      setFastest({
         labels: labels,
         datasets: [
           {
@@ -109,6 +157,11 @@ export default function SetDate() {
             borderColor: "rgba(255, 99, 0, 1)",
             borderWidth: 1,
           },
+        ],
+      });
+      setClosestAstorid({
+        labels: labels,
+        datasets: [
           {
             label: "Closest Asteroid (km)",
             data: closestAsteroid,
@@ -116,18 +169,16 @@ export default function SetDate() {
             borderColor: "rgba(54, 162, 235, 1)",
             borderWidth: 1,
           },
+        ],
+      });
+      setAvgSizeAstroid({
+        labels: labels,
+        datasets: [
           {
             label: "Average Size of Asteroids (km)",
             data: avgSizeAsteroid,
             backgroundColor: "rgba(255, 206, 86, 0.2)",
             borderColor: "rgba(255, 206, 86, 1)",
-            borderWidth: 1,
-          },
-          {
-            label: "Number of Asteroids",
-            data: numAsteroids,
-            backgroundColor: "rgba(75, 192, 192, 0.2)",
-            borderColor: "rgba(75, 192, 192, 1)",
             borderWidth: 1,
           },
         ],
@@ -141,14 +192,29 @@ export default function SetDate() {
   };
 
   useEffect(() => {
-    if (Object.keys(chartData).length !== 0) {
+    if (Object.keys(numOfAsteroids).length !== 0) {
       const ctx = document.getElementById("chart");
       new Chart(ctx, {
         type: "bar",
-        data: chartData,
+        data: numOfAsteroids,
+      });
+      const ctx1 = document.getElementById("chart1");
+      new Chart(ctx1, {
+        type: "line",
+        data: fastest,
+      });
+      const ctx2 = document.getElementById("chart2");
+      new Chart(ctx2, {
+        type: "bar",
+        data: closestAstroid,
+      });
+      const ctx3 = document.getElementById("chart3");
+      new Chart(ctx3, {
+        type: "bar",
+        data: avgSizeAstroid,
       });
     }
-  }, [chartData]);
+  }, [numOfAsteroids]);
 
   return (
     <div className="container">
@@ -164,6 +230,15 @@ export default function SetDate() {
       </form>
       <div className="chart-container">
         <canvas id="chart"></canvas>
+      </div>
+      <div className="chart-container">
+        <canvas id="chart1"></canvas>
+      </div>
+      <div className="chart-container">
+        <canvas id="chart2"></canvas>
+      </div>
+      <div className="chart-container">
+        <canvas id="chart3"></canvas>
       </div>
     </div>
   );
