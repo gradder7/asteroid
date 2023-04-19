@@ -1,12 +1,11 @@
-import SetDate from "./SetDate";
-import { fetchData } from "./utils/fetchData";
+import Navbar from "./components/Navbar";
+import SetDate from "./components/SetDate";
 function App() {
-
   return (
-    <div>
-      <h1>Welocme to NASA</h1>
-      <SetDate/>
-    </div>
+    <>
+      <Navbar />
+      <SetDate />
+    </>
   );
 }
 
