@@ -6,35 +6,40 @@ import Chart from "chart.js/auto";
 
 export default function SetDate() {
   const [date, setdate] = useState([]);
-  const [showData, setShowData] = useState(false);
-  const [asteroidData, setAsteroidData] = useState({});
+  const [showBtn, setShowBtn] = useState(true);
   // const [chartData, setChartData] = useState({});
   const [fastest, setFastest] = useState({});
   const [numOfAsteroids, setNumOfAsteorids] = useState({});
   const [closestAstroid, setClosestAstorid] = useState({});
   const [avgSizeAstroid, setAvgSizeAstroid] = useState({});
+  const [charts, setCharts] = useState([]);
 
   const handleOnchangeDate = (value) => {
+    setShowBtn(true);
     setdate(value);
   };
-  let dateStart =
-    date && date.length ? date[0].toISOString().slice(0, 10) : null;
-  let dateEnd = date && date.length ? date[1].toISOString().slice(0, 10) : null;
 
-  useEffect(() => {
-    const getData = async () => {
-      let data = await fetchData(dateStart, dateEnd);
-      setAsteroidData(data.near_earth_objects);
-    };
-    if (showData) {
-      getData();
+  const getDate = async () => {
+    let dateStart =
+      date && date.length ? date[0].toISOString().slice(0, 10) : null;
+    let dateEnd =
+      date && date.length ? date[1].toISOString().slice(0, 10) : null;
+    let data = await fetchData(dateStart, dateEnd);
+
+    return data.near_earth_objects;
+  };
+
+  const checkChartAlreadyExistAndDestroy = () => {
+    if (charts.length) {
+      charts.forEach((chart) => {
+        chart.destroy();
+      });
+      setCharts([]);
     }
-  }, [dateStart, dateEnd, showData]);
-  console.log("all data", asteroidData);
+  };
 
-  //fetch the data
-  useEffect(() => {
-    if (Object.keys(asteroidData).length !== 0) {
+  const handleAsteroidData = (asteroidData) => {
+    if (Object.keys(asteroidData || {}).length !== 0) {
       //array of dates
       let labels = Object.keys(asteroidData);
       let fastestAsteroid = [];
@@ -102,39 +107,6 @@ export default function SetDate() {
         numAsteroids.push(asteroids.length);
       }
 
-      // setChartData({
-      //   labels: labels,
-      //   datasets: [
-      //     {
-      // label: "Fastest Asteroid (km/h)",
-      // data: fastestAsteroid,
-      // backgroundColor: "rgba(255, 99,0, 0.2)",
-      // borderColor: "rgba(255, 99, 0, 1)",
-      // borderWidth: 1,
-      //     },
-      //     {
-      // label: "Closest Asteroid (km)",
-      // data: closestAsteroid,
-      // backgroundColor: "rgba(54, 162, 235, 0.2)",
-      // borderColor: "rgba(54, 162, 235, 1)",
-      // borderWidth: 1,
-      //     },
-      //     {
-      // label: "Average Size of Asteroids (km)",
-      // data: avgSizeAsteroid,
-      // backgroundColor: "rgba(255, 206, 86, 0.2)",
-      // borderColor: "rgba(255, 206, 86, 1)",
-      // borderWidth: 1,
-      //     },
-      //     {
-      // label: "Number of Asteroids",
-      // data: numAsteroids,
-      // backgroundColor: "rgba(75, 192, 192, 0.2)",
-      // borderColor: "rgba(75, 192, 192, 1)",
-      // borderWidth: 1,
-      //     },
-      //   ],
-      // });
       setNumOfAsteorids({
         labels: labels,
         datasets: [
@@ -184,35 +156,44 @@ export default function SetDate() {
         ],
       });
     }
-  }, [asteroidData]);
+  };
 
   const handleOnSubmit = (e) => {
     e.preventDefault();
-    setShowData(true);
+    checkChartAlreadyExistAndDestroy();
+    getDate()
+      .then((data) => {
+        handleAsteroidData(data);
+        setShowBtn(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   useEffect(() => {
     if (Object.keys(numOfAsteroids).length !== 0) {
       const ctx = document.getElementById("chart");
-      new Chart(ctx, {
+      let chart_1 = new Chart(ctx, {
         type: "bar",
         data: numOfAsteroids,
       });
       const ctx1 = document.getElementById("chart1");
-      new Chart(ctx1, {
+      let chart_2 = new Chart(ctx1, {
         type: "line",
         data: fastest,
       });
       const ctx2 = document.getElementById("chart2");
-      new Chart(ctx2, {
+      let chart_3 = new Chart(ctx2, {
         type: "bar",
         data: closestAstroid,
       });
       const ctx3 = document.getElementById("chart3");
-      new Chart(ctx3, {
+      let chart_4 = new Chart(ctx3, {
         type: "bar",
         data: avgSizeAstroid,
       });
+      setCharts([chart_1, chart_2, chart_3, chart_4]);
     }
   }, [numOfAsteroids]);
 
@@ -224,7 +205,7 @@ export default function SetDate() {
           value={date}
           onChange={handleOnchangeDate}
         />
-        <button className="btn btn-primary" type="submit">
+        <button className="btn btn-primary" type="submit" disabled={!showBtn}>
           Submit
         </button>
       </form>
