@@ -3,32 +3,52 @@ import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
 import { fetchData } from "../utils/fetchData";
 import Chart from "chart.js/auto";
+import { handleAsteroidData } from "../utils/handleAstroidData";
+import { toast } from "react-toastify";
+import Loading from "./Loading";
+import Typewriter from "typewriter-effect";
 
 export default function SetDate() {
   const [date, setdate] = useState([]);
   const [showBtn, setShowBtn] = useState(true);
-  // const [chartData, setChartData] = useState({});
   const [fastest, setFastest] = useState({});
+  const [loading, setLoading] = useState(false);
   const [numOfAsteroids, setNumOfAsteorids] = useState({});
   const [closestAstroid, setClosestAstorid] = useState({});
   const [avgSizeAstroid, setAvgSizeAstroid] = useState({});
   const [charts, setCharts] = useState([]);
-
   const handleOnchangeDate = (value) => {
     setShowBtn(true);
     setdate(value);
   };
 
   const getDate = async () => {
-    let dateStart =
-      date && date.length ? date[0].toISOString().slice(0, 10) : null;
-    let dateEnd =
-      date && date.length ? date[1].toISOString().slice(0, 10) : null;
-    let data = await fetchData(dateStart, dateEnd);
-
+    if (!date || date.length !== 2) {
+      // Show error if date is not an array with two values
+      toast.error("Please select a date first to continue!");
+      setLoading(false);
+      throw new Error(
+        "Invalid date range. Please provide a start and end date."
+      );
+    }
+    const start = new Date(date[0]);
+    const end = new Date(date[1]);
+    const dayDifference = Math.ceil((end - start) / (1000 * 60 * 60 * 24)); // Get the difference in days
+    if (dayDifference >= 8) {
+      setLoading(false);
+      toast.error("Date range must be 7 days or less.");
+      // Show error if the difference in days is greater than or equal to 8
+      throw new Error("Date range must be 7 days or less.");
+    }
+    // Format dates for API call
+    const dateStart = start.toISOString().slice(0, 10);
+    const dateEnd = end.toISOString().slice(0, 10);
+    // Make API call
+    const data = await fetchData(dateStart, dateEnd);
     return data.near_earth_objects;
   };
 
+  // destroy the canvas id
   const checkChartAlreadyExistAndDestroy = () => {
     if (charts.length) {
       charts.forEach((chart) => {
@@ -38,150 +58,62 @@ export default function SetDate() {
     }
   };
 
-  const handleAsteroidData = (asteroidData) => {
-    if (Object.keys(asteroidData || {}).length !== 0) {
-      //array of dates
-      let labels = Object.keys(asteroidData);
-      let fastestAsteroid = [];
-      let closestAsteroid = [];
-      let avgSizeAsteroid = [];
-      let numAsteroids = [];
-
-      //array of all objects assocoated with dates
-      for (const [date, asteroids] of Object.entries(asteroidData)) {
-        console.log("perastorids", asteroids);
-
-        //object having the fasted data among the date
-        let fastestAsteroidForDate = asteroids.reduce(
-          (prev, curr) =>
-            parseFloat(
-              curr.close_approach_data[0].relative_velocity.kilometers_per_hour
-            ) >
-            parseFloat(
-              prev.close_approach_data[0].relative_velocity.kilometers_per_hour
-            )
-              ? curr
-              : prev,
-          asteroids[0]
-        );
-        console.log("fastest", fastestAsteroidForDate);
-
-        //get the fasted data of date
-        fastestAsteroid.push(
-          parseFloat(
-            fastestAsteroidForDate.close_approach_data[0].relative_velocity
-              .kilometers_per_hour
-          ).toFixed(2)
-        );
-
-        let closestAsteroidForDate = asteroids.reduce(
-          (prev, curr) =>
-            parseFloat(curr.close_approach_data[0].miss_distance.kilometers) <
-            parseFloat(prev.close_approach_data[0].miss_distance.kilometers)
-              ? curr
-              : prev,
-          asteroids[0]
-        );
-        closestAsteroid.push(
-          parseFloat(
-            closestAsteroidForDate.close_approach_data[0].miss_distance
-              .kilometers
-          ).toFixed(2)
-        );
-
-        let avgSizeAsteroidForDate =
-          asteroids.reduce(
-            (prev, curr) =>
-              prev +
-              (parseFloat(
-                curr.estimated_diameter.kilometers.estimated_diameter_min
-              ) +
-                parseFloat(
-                  curr.estimated_diameter.kilometers.estimated_diameter_max
-                )) /
-                2,
-            0
-          ) / asteroids.length;
-        avgSizeAsteroid.push(avgSizeAsteroidForDate.toFixed(2));
-
-        numAsteroids.push(asteroids.length);
-      }
-
-      setNumOfAsteorids({
-        labels: labels,
-        datasets: [
-          {
-            label: "Number of Asteroids",
-            data: numAsteroids,
-            backgroundColor: "rgba(75, 192, 192, 0.2)",
-            borderColor: "rgba(75, 192, 192, 1)",
-            borderWidth: 1,
-          },
-        ],
-      });
-      setFastest({
-        labels: labels,
-        datasets: [
-          {
-            label: "Fastest Asteroid (km/h)",
-            data: fastestAsteroid,
-            backgroundColor: "rgba(255, 99,0, 0.2)",
-            borderColor: "rgba(255, 99, 0, 1)",
-            borderWidth: 1,
-          },
-        ],
-      });
-      setClosestAstorid({
-        labels: labels,
-        datasets: [
-          {
-            label: "Closest Asteroid (km)",
-            data: closestAsteroid,
-            backgroundColor: "rgba(54, 162, 235, 0.2)",
-            borderColor: "rgba(54, 162, 235, 1)",
-            borderWidth: 1,
-          },
-        ],
-      });
-      setAvgSizeAstroid({
-        labels: labels,
-        datasets: [
-          {
-            label: "Average Size of Asteroids (km)",
-            data: avgSizeAsteroid,
-            backgroundColor: "rgba(255, 206, 86, 0.2)",
-            borderColor: "rgba(255, 206, 86, 1)",
-            borderWidth: 1,
-          },
-        ],
-      });
-    }
-  };
-
+  //handle submit
   const handleOnSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
     checkChartAlreadyExistAndDestroy();
     getDate()
       .then((data) => {
-        handleAsteroidData(data);
+        handleAsteroidData(
+          data,
+          setNumOfAsteorids,
+          setFastest,
+          setClosestAstorid,
+          setAvgSizeAstroid
+        );
         setShowBtn(false);
+        setLoading(false);
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
+  //chats objects
   useEffect(() => {
     if (Object.keys(numOfAsteroids).length !== 0) {
       const ctx = document.getElementById("chart");
       let chart_1 = new Chart(ctx, {
         type: "bar",
         data: numOfAsteroids,
+        options: {
+          animations: {
+            tension: {
+              duration: 1000,
+              easing: "linear",
+              from: 1,
+              to: 0,
+              loop: true,
+            },
+          },
+        },
       });
       const ctx1 = document.getElementById("chart1");
       let chart_2 = new Chart(ctx1, {
         type: "line",
         data: fastest,
+        options: {
+          animations: {
+            tension: {
+              duration: 1000,
+              easing: "linear",
+              from: 1,
+              to: 0,
+              loop: true,
+            },
+          },
+        },
       });
       const ctx2 = document.getElementById("chart2");
       let chart_3 = new Chart(ctx2, {
@@ -198,28 +130,50 @@ export default function SetDate() {
   }, [numOfAsteroids]);
 
   return (
-    <div className="container">
-      <form onSubmit={handleOnSubmit}>
-        <DateRangePicker
-          style={{ width: 400 }}
-          value={date}
-          onChange={handleOnchangeDate}
-        />
-        <button className="btn btn-primary" type="submit" disabled={!showBtn}>
-          Submit
-        </button>
-      </form>
-      <div className="chart-container">
-        <canvas id="chart"></canvas>
-      </div>
-      <div className="chart-container">
-        <canvas id="chart1"></canvas>
-      </div>
-      <div className="chart-container">
-        <canvas id="chart2"></canvas>
-      </div>
-      <div className="chart-container">
-        <canvas id="chart3"></canvas>
+    <div className="m-auto mt-5" style={{ width: "600px" }}>
+      <div className="container">
+        <form onSubmit={handleOnSubmit}>
+          <DateRangePicker
+            style={{ width: 400 }}
+            value={date}
+            onChange={handleOnchangeDate}
+          />
+          <button
+            className="btn btn-primary mx-5"
+            type="submit"
+            disabled={!showBtn}
+          >
+            Submit
+          </button>
+        </form>
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+            <h1 className="text-center mt-4">Asteroid data</h1>
+            <h2 className="text-center">
+              <Typewriter
+                options={{
+                  strings: ["Closest", "Fastest", "Asteroid", "NASA"],
+                  autoStart: true,
+                  loop: true,
+                }}
+              />
+            </h2>
+            <div className="chart-container">
+              <canvas id="chart"></canvas>
+            </div>
+            <div className="chart-container">
+              <canvas id="chart1"></canvas>
+            </div>
+            <div className="chart-container">
+              <canvas id="chart2"></canvas>
+            </div>
+            <div className="chart-container">
+              <canvas id="chart3"></canvas>
+            </div>{" "}
+          </>
+        )}
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ function Navbar() {
   return (
     <div>
       <nav
-        className="navbar navbar-light bg-light"
+        className="navbar navbar-light bg-light navbar-fixed-top"
         style={{ backgroundColor: "#212121" }}
       >
         <div className="container-fluid">
