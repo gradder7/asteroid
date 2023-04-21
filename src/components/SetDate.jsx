@@ -101,7 +101,7 @@ export default function SetDate() {
           <p className="text-center mb-5">
             <em>*Please select a date range to fetch the data</em>
           </p>
-          <form onSubmit={handleOnSubmit} mb-5>
+          <form onSubmit={handleOnSubmit}>
             <DateRangePicker
               style={{ width: 400 }}
               value={date}
