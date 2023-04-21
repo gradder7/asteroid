@@ -11,7 +11,6 @@ function Navbar() {
         <div className="container-fluid">
           <a className="navbar-brand" href="#">
             <img src={logo} alt="logo" width={100} height={50} />
-            NASA
           </a>
           <h1>Asteroid Data</h1>
         </div>
