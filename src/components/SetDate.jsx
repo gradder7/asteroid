@@ -90,12 +90,15 @@ export default function SetDate() {
         options: {
           animations: {
             tension: {
-              duration: 1000,
+              duration: 5000,
               easing: "linear",
               from: 1,
               to: 0,
               loop: true,
             },
+          },
+          tooltips: {
+            enabled: false,
           },
         },
       });
@@ -160,16 +163,16 @@ export default function SetDate() {
                 }}
               />
             </h2>
-            <div className="chart-container">
+            <div className="chart-container mb-5">
               <canvas id="chart"></canvas>
             </div>
-            <div className="chart-container">
+            <div className="chart-container mb-5">
               <canvas id="chart1"></canvas>
             </div>
-            <div className="chart-container">
+            <div className="chart-container mb-5">
               <canvas id="chart2"></canvas>
             </div>
-            <div className="chart-container">
+            <div className="chart-container mb-5">
               <canvas id="chart3"></canvas>
             </div>{" "}
           </>

@@ -123,9 +123,6 @@
 //   }
 // };
 
-
-
-
 export const handleAsteroidData = (
   asteroidData,
   setNumOfAsteorids,
@@ -210,34 +207,61 @@ export const handleAsteroidData = (
         {
           label: "Number of Asteroids",
           data: numAsteroids,
-          backgroundColor: "rgba(75, 192, 192, 0.2)",
+          backgroundColor: [
+            "green",
+            "red",
+            "yellow",
+            "blue",
+            "purple",
+            "aqua",
+            "orange",
+            "brown",
+          ],
           borderColor: "rgba(75, 192, 192, 1)",
+          // backgrond color:[c,c,ccc,];
           borderWidth: 1,
         },
       ],
     });
 
-    
-  setFastest({
-    labels: labels,
-    datasets: [
-      {
-        label: `Fastest Asteroid (km/h)`,
-        data: fastestAsteroid,
-        backgroundColor: "rgba(255, 99,0, 0.2)",
-        borderColor: "rgba(255, 99, 0, 1)",
-        borderWidth: 1,
-      },
-    ],
-  });
-    
+    setFastest({
+      labels: labels,
+      datasets: [
+        {
+          label: `Fastest Asteroid (km/h)`,
+          data: fastestAsteroid,
+          backgroundColor:  [
+            "green",
+            "red",
+            "yellow",
+            "blue",
+            "purple",
+            "aqua",
+            "orange",
+            "brown",
+          ],
+          borderColor: "rgba(255, 99, 0, 1)",
+          borderWidth: 1,
+        },
+      ],
+    });
+
     setClosestAstorid({
       labels: labels,
       datasets: [
         {
           label: "Closest Asteroid (km)",
           data: closestAsteroid,
-          backgroundColor: "rgba(54, 162, 235, 0.2)",
+          backgroundColor: [
+            "green",
+            "red",
+            "yellow",
+            "blue",
+            "purple",
+            "aqua",
+            "orange",
+            "brown",
+          ],
           borderColor: "rgba(54, 162, 235, 1)",
           borderWidth: 1,
         },
@@ -249,7 +273,16 @@ export const handleAsteroidData = (
         {
           label: "Average Size of Asteroid (km)",
           data: avgSizeAsteroid,
-          backgroundColor: "rgba(153, 102, 255, 0.2)",
+          backgroundColor: [
+            "green",
+            "red",
+            "yellow",
+            "blue",
+            "purple",
+            "aqua",
+            "orange",
+            "brown",
+          ],
           borderColor: "rgba(153, 102, 255, 1)",
           borderWidth: 1,
         },
