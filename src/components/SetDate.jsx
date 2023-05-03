@@ -90,6 +90,7 @@ export default function SetDate() {
         type: "bar",
         data: avgSizeAstroid,
       });
+      //to destroy the canvas id
       setCharts([chart_1, chart_2, chart_3, chart_4]);
     }
   }, [numOfAsteroids]);

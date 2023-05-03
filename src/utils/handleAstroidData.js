@@ -6,6 +6,10 @@ export const handleAsteroidData = (
   setClosestAstorid,
   setAvgSizeAstroid
 ) => {
+  // dates will be keys
+  //objects of dates as key and data associated with the key
+  // console.log(asteroidData);
+
   if (Object.keys(asteroidData || {}).length !== 0) {
     //array of dates
     let labels = Object.keys(asteroidData);
@@ -16,10 +20,12 @@ export const handleAsteroidData = (
     let avgSizeAsteroid = [];
     let numAsteroids = [];
 
-    //array of all objects assocoated with dates
+    //array of all objects associated with dates and there data 
     for (const [date, asteroids] of Object.entries(asteroidData)) {
+      console.log("astroid", asteroids);
 
       //object having the fasted data among the date
+      //parse float to convert the string data to the numberiv value for comparision 
       let fastestAsteroidForDate = asteroids.reduce(
         (prev, curr) =>
           parseFloat(
@@ -30,7 +36,7 @@ export const handleAsteroidData = (
           )
             ? curr
             : prev,
-        asteroids[0]
+        asteroids[0]//acumulator
       );
 
       //get the fasted data of date
@@ -42,6 +48,8 @@ export const handleAsteroidData = (
       );
       fastestAsteroidName.push(fastestAsteroidForDate.name);
 
+
+      // closest asteroid
       let closestAsteroidForDate = asteroids.reduce(
         (prev, curr) =>
           parseFloat(curr.close_approach_data[0].miss_distance.kilometers) <
@@ -57,6 +65,8 @@ export const handleAsteroidData = (
       );
       closestAsteroidName.push(closestAsteroidForDate.name);
 
+
+      // average size
       let avgSizeAsteroidForDate =
         asteroids.reduce(
           (prev, curr) =>
@@ -75,6 +85,7 @@ export const handleAsteroidData = (
       numAsteroids.push(asteroids.length);
     }
 
+    // number of asteroid
     setNumOfAsteorids({
       labels: labels,
       datasets: [
@@ -104,7 +115,7 @@ export const handleAsteroidData = (
         {
           label: `Fastest Asteroid (km/h)`,
           data: fastestAsteroid,
-          backgroundColor:  [
+          backgroundColor: [
             "green",
             "red",
             "yellow",

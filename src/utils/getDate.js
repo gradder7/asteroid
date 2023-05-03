@@ -1,7 +1,6 @@
 import { toast } from "react-toastify";
 import { fetchData } from "./fetchData";
 
-
 // get the date and data of that date-range
 export const getDate = async (date, setLoading) => {
   if (!date || date.length !== 2) {
@@ -11,6 +10,8 @@ export const getDate = async (date, setLoading) => {
     throw new Error("Invalid date range. Please provide a start and end date.");
   }
   const start = new Date(date[0]);
+  console.log("start", start);
+
   const end = new Date(date[1]);
   // Get the difference in days
   const dayDifference = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
@@ -22,6 +23,7 @@ export const getDate = async (date, setLoading) => {
   }
   // Format dates for API call
   const dateStart = start.toISOString().slice(0, 10);
+
   const dateEnd = end.toISOString().slice(0, 10);
   // Make API call
   const data = await fetchData(dateStart, dateEnd);
