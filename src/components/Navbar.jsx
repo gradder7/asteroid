@@ -12,7 +12,7 @@ function Navbar() {
           <a className="navbar-brand" href="#">
             <img src={logo} alt="logo" width={100} height={50} />
           </a>
-          <h1>Asteroid Data</h1>
+          <h1>Asteroid Data-For All</h1>
         </div>
       </nav>
     </div>
